@@ -30,7 +30,7 @@ class Server:
         global keep_running
         # Open socket on given self.port.
         server_log("Opening socket on port " + str(self.port))
-        server_address = ('localhost', self.port)
+        server_address = ('4.194.84.96', self.port)
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(server_address)
         server_socket.listen(1)
