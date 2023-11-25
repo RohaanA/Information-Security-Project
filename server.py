@@ -32,6 +32,7 @@
 import socket
 from utils import server_log
 import signal
+import threading
 
 
 # Global variable
@@ -56,6 +57,9 @@ class Server:
         server_log("Port: " + str(self.port))
         server_log("--------------------", "warning")
         pass
+    def _handle_client(self, client_socket, client_address):
+        server_log("[CLIENT HANDLER] Client connected: {}:{}".format(*client_address), "success")
+        pass
     def startServer(self):
         global keep_running
         # Open socket on given self.port.
@@ -67,6 +71,10 @@ class Server:
         server_socket.listen(1)
         while keep_running:
             # Accept incoming connections.
+            server_log("Server is listening on {}:{}".format(*server_address), "success")
+            client_socket, client_address = server_socket.accept()
+            #Start a new thread to handle the client
+            threading.Thread(target=Server._handle_client, args=(client_socket, client_address)).start()
             pass
         
         server_socket.close()
@@ -81,7 +89,7 @@ class Server:
 
 # Start server side code
 def server():
-    port = 6000
+    port = 443
     
     server = Server(port)
     #Printing current server details
