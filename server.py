@@ -2,6 +2,7 @@ import socket
 import signal
 import threading
 import select
+import ssl
 from utils import server_log
 
 # Global variable
@@ -29,9 +30,13 @@ class Server:
     def startServer(self):
         global keep_running
         # Open socket on given self.port.
+        certfile = '/etc/letsencrypt/live/rohaan.xyz/fullchain.pem'
+        keyfile = '/etc/letsencrypt/live/rohaan.xyz/privkey.pem'
+        context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        context.load_cert_chain(certfile, keyfile)
         server_log("Opening socket on port " + str(self.port))
         server_address = ('0.0.0.0', self.port)
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket = context.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_STREAM), server_side=True)
         server_socket.bind(server_address)
         server_socket.listen(1)
 

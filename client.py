@@ -1,7 +1,7 @@
 import socket
 from utils import client_log
 #
-vpn_host = "4.194.84.96"
+vpn_host = "rohaan.xyz"
 vpn_port = 443
 def start_connection():
     client_log("Beginning connection to VPN Server: " + vpn_host + ":" + str(vpn_port))
