@@ -17,8 +17,8 @@ class Server:
     def __init__(self, port):
         self._port = port
         self._host = "0.0.0.0"
-        self._certfile = 'certs/server_cert.pem'
-        self._keyfile = 'certs/server_key.pem'
+        self._certfile = '/etc/letsencrypt/live/rohaan.xyz/fullchain.pem'
+        self._keyfile = '/etc/letsencrypt/live/rohaan.xyz/privkey.pem'
 
     def printDetails(self):
         server_log("--------------------", "warning")
@@ -27,7 +27,7 @@ class Server:
         server_log("Host: " + str(self._host))
         server_log("--------------------", "warning")
 
-    def _handle_client(self, ssl_socket, client_address):
+    def _handle_client(self, client_socket, ssl_socket, client_address):
         server_log("[CLIENT HANDLER] Client connected: {}:{}".format(*client_address), "success")
             # Receive data from the client
         received_data = ssl_socket.recv(1024)
@@ -38,6 +38,7 @@ class Server:
 
         # Close the SSL/TLS connection
         ssl_socket.close()
+        client_socket.close()
 
     def startServer(self):
         global keep_running
@@ -72,9 +73,9 @@ class Server:
                         ssl_context.load_cert_chain(certfile=self._certfile, keyfile=self._keyfile)
                         ssl_socket = ssl_context.wrap_socket(client_socket, server_side=True)
                         # Add the new client socket to the list of sockets
-                        sockets.append(ssl_socket)
+                        sockets.append(server_socket)
                         # Start a new thread to handle the client
-                        threading.Thread(target=self._handle_client, args=(ssl_socket, client_address)).start()
+                        threading.Thread(target=self._handle_client, args=(client_socket, ssl_socket, client_address)).start()
 
                     else:
                         # Handle client communication
