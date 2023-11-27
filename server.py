@@ -70,6 +70,10 @@ class Server:
                     continue
 
                 for sock in readable:
+                    if sock.fileno() == -1:
+                        # Socket is closed, remove it from the list
+                        sockets.remove(sock)
+                        continue
                     if sock is server_socket:
                         # Accept new client connection
                         client_socket, client_address = server_socket.accept()
