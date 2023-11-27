@@ -2,8 +2,8 @@ import socket
 import signal
 import threading
 import select
-import ssl
 from utils import server_log
+import ssl
 
 # Global variable
 keep_running = True
@@ -15,31 +15,40 @@ def shutdown_server(signal, frame):
 
 class Server:
     def __init__(self, port):
-        self.port = port
+        self._port = port
+        self._host = "0.0.0.0"
+        self._certfile = 'certs/server_cert.pem'
+        self._keyfile = 'certs/server_key.pem'
 
     def printDetails(self):
         server_log("--------------------", "warning")
         server_log("Printing Server Details")
-        server_log("Port: " + str(self.port))
+        server_log("Port: " + str(self._port))
+        server_log("Host: " + str(self._host))
         server_log("--------------------", "warning")
 
-    def _handle_client(self, client_socket, client_address):
+    def _handle_client(self, ssl_socket, client_address):
         server_log("[CLIENT HANDLER] Client connected: {}:{}".format(*client_address), "success")
-        # Handle client communication here
+            # Receive data from the client
+        received_data = ssl_socket.recv(1024)
+        print('Received data from client:', received_data)
+        # Send a response back to the client
+        response = 'Hello, client!'
+        ssl_socket.send(response.encode())
+
+        # Close the SSL/TLS connection
+        ssl_socket.close()
 
     def startServer(self):
         global keep_running
         # Open socket on given self.port.
-        certfile = '/etc/letsencrypt/live/rohaan.xyz/fullchain.pem'
-        keyfile = '/etc/letsencrypt/live/rohaan.xyz/privkey.pem'
-        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        context.load_cert_chain(certfile, keyfile)
-        server_log("Opening socket on port " + str(self.port))
-        server_address = ('0.0.0.0', self.port)
-        server_socket = context.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_STREAM), server_side=True)
+        server_log("Opening socket on port " + str(self._port))
+        server_address = ('0.0.0.0', self._port)
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(server_address)
         server_socket.listen(1)
-
+        print('Server listening on {}:{}'.format(self._host, self._port))
+        
         # Make the server socket non-blocking
         server_socket.setblocking(False)
 
@@ -55,10 +64,17 @@ class Server:
                     if sock is server_socket:
                         # Accept new client connection
                         client_socket, client_address = server_socket.accept()
+                        print('Accepted connection from {}:{}'.format(client_address[0], client_address[1]))
+                        # Wrap the client socket with an SSL/TLS context
+                        ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                        print(self._certfile)
+                        print(self._keyfile)
+                        ssl_context.load_cert_chain(certfile=self._certfile, keyfile=self._keyfile)
+                        ssl_socket = ssl_context.wrap_socket(client_socket, server_side=True)
                         # Add the new client socket to the list of sockets
-                        sockets.append(client_socket)
+                        sockets.append(ssl_socket)
                         # Start a new thread to handle the client
-                        threading.Thread(target=self._handle_client, args=(client_socket, client_address)).start()
+                        threading.Thread(target=self._handle_client, args=(ssl_socket, client_address)).start()
 
                     else:
                         # Handle client communication
