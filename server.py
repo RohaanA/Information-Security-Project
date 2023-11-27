@@ -58,8 +58,16 @@ class Server:
 
         while keep_running:
             try:
+                try:
                 # Use select to monitor sockets for activity
-                readable, _, _ = select.select(sockets, [], [], 0.1)
+                    readable, _, _ = select.select(sockets, [], [], 0.1)
+                except select.error:
+                    # Raised when one of the monitored sockets is closed
+                    # So remove it from the list of sockets we're monitoring
+                    for sock in sockets:
+                        if sock.fileno() == -1:
+                            sockets.remove(sock)
+                    continue
 
                 for sock in readable:
                     if sock is server_socket:
@@ -73,7 +81,7 @@ class Server:
                         ssl_context.load_cert_chain(certfile=self._certfile, keyfile=self._keyfile)
                         ssl_socket = ssl_context.wrap_socket(client_socket, server_side=True)
                         # Add the new client socket to the list of sockets
-                        sockets.append(server_socket)
+                        sockets.append(ssl_socket)
                         # Start a new thread to handle the client
                         threading.Thread(target=self._handle_client, args=(client_socket, ssl_socket, client_address)).start()
 
