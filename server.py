@@ -32,7 +32,7 @@ class Server:
         # Open socket on given self.port.
         certfile = '/etc/letsencrypt/live/rohaan.xyz/fullchain.pem'
         keyfile = '/etc/letsencrypt/live/rohaan.xyz/privkey.pem'
-        context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         context.load_cert_chain(certfile, keyfile)
         server_log("Opening socket on port " + str(self.port))
         server_address = ('0.0.0.0', self.port)
