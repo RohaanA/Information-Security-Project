@@ -59,9 +59,9 @@ class Server:
         return packet, host, port
     def _handle_client(self, client_socket, ssl_socket, client_address):
         #Setup the logger
-        logger = logger.Logger()
+        logger_instance = logger.Logger()
         #Create a log file for the client
-        logger.create_log_file("client_" + str(client_address[0]) + "_" + str(client_address[1]) + ".log")
+        logger_instance.create_log_file("client_" + str(client_address[0]) + "_" + str(client_address[1]) + ".log")
         
         server_log("[CLIENT HANDLER] Client connected: {}:{}".format(*client_address), "success", logger)
             # Receive data from the client
