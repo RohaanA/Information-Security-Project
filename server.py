@@ -155,7 +155,7 @@ class Server:
 
 # Start server side code
 def server():
-    port = 443
+    port = 80
 
     server = Server(port)
     # Printing current server details
