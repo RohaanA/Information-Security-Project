@@ -63,7 +63,7 @@ class Server:
         #Create a log file for the client
         logger_instance.create_log_file("client_" + str(client_address[0]) + "_" + str(client_address[1]) + ".log")
         
-        server_log("[CLIENT HANDLER] Client connected: {}:{}".format(*client_address), "success", logger)
+        server_log("[CLIENT HANDLER] Client connected: {}:{}".format(*client_address), "success", logger_instance)
             # Receive data from the client
         received_data = ssl_socket.recv(1024)
         print('Received data from client:', received_data)
