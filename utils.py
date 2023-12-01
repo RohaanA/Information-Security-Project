@@ -7,9 +7,11 @@ color_codes = {
         "info": '\033[94m'
 }
 #This function is called to log the server messages
-def server_log(message, type="info", console_text=None):
+def server_log(message, type="info", logger=None):
     color_code = color_codes.get(type, color_codes.get("info"))
     print(color_code + "[SERVER] " + message + '\033[0m')
+    if logger:
+        logger.log(message)
 def client_log(message, type="info", log_text=None):
     color_code = color_codes.get(type, color_codes.get("info"))
     print(color_code + "[CLIENT] " + message + '\033[0m')

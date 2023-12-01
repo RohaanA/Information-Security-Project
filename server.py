@@ -4,6 +4,7 @@ import threading
 import select
 from utils import server_log
 import ssl
+import logger
 
 # Global variable
 keep_running = True
@@ -57,7 +58,12 @@ class Server:
         print(packet)
         return packet, host, port
     def _handle_client(self, client_socket, ssl_socket, client_address):
-        server_log("[CLIENT HANDLER] Client connected: {}:{}".format(*client_address), "success")
+        #Setup the logger
+        logger = logger.Logger()
+        #Create a log file for the client
+        logger.create_log_file("client_" + str(client_address[0]) + "_" + str(client_address[1]) + ".log")
+        
+        server_log("[CLIENT HANDLER] Client connected: {}:{}".format(*client_address), "success", logger)
             # Receive data from the client
         received_data = ssl_socket.recv(1024)
         print('Received data from client:', received_data)

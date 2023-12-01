@@ -33,8 +33,16 @@ print(request)
 ssl_socket.send(request.encode())
 
 # Receive a response from the server
-response = ssl_socket.recv(1024)
+response = ssl_socket.recv(4096)
 print('Received response from server:', response.decode())
+
+# Save the received data to an HTML file
+with open("received.html", "wb") as file:
+    file.write(response)
+
+# Open the file in a web browser
+import webbrowser
+webbrowser.open("received.html")
 
 # Close the SSL/TLS connection
 ssl_socket.close()
