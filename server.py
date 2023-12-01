@@ -27,14 +27,57 @@ class Server:
         server_log("Host: " + str(self._host))
         server_log("--------------------", "warning")
 
+    def _generate_packet_from_request(self, request_data):
+        # Convert the request data to string and split it into lines
+        request_lines = request_data.decode().split("\r\n")
+
+        # Extract the request method, URL, and protocol version
+        request_line = request_lines[0]
+        method, url, version = request_line.split(" ")
+
+        # Extract the headers from the request
+        headers = {}
+        for line in request_lines[1:]:
+            if not line:
+                break
+            header_name, header_value = line.split(": ", 1)
+            headers[header_name] = header_value
+
+        # Extract the host and port from the URL
+        host_port = url.split("//")[1].split("/")[0]
+        host, port = host_port.split(":")
+
+        # Create the packet by combining the method, URL, headers, and body (if any)
+        packet = f"{method} {url} {version}\r\n"
+        for header_name, header_value in headers.items():
+            packet += f"{header_name}: {header_value}\r\n"
+        packet += "\r\n"
+
+        # Print the generated packet
+        print(packet)
+        return packet, host, port
     def _handle_client(self, client_socket, ssl_socket, client_address):
         server_log("[CLIENT HANDLER] Client connected: {}:{}".format(*client_address), "success")
             # Receive data from the client
         received_data = ssl_socket.recv(1024)
         print('Received data from client:', received_data)
+        packet,host,port = self._generate_packet_from_request(received_data)
+        
+        destination_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        destination_socket.connect((host, int(port)))
+        destination_socket.send(packet.encode())
+
+        # Receive the response from the destination
+        response = destination_socket.recv(4096)
+
+        # Print the response
+        decoded_response = response.decode()
+        print(decoded_response)
+        
+        
         # Send a response back to the client
-        response = 'Hello, client!'
-        ssl_socket.send(response.encode())
+        # response = 'Hello, client!'
+        ssl_socket.send(decoded_response.encode())
 
         # Close the SSL/TLS connection
         ssl_socket.close()
