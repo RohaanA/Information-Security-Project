@@ -19,6 +19,7 @@ class Logger:
             file.write("")
 
         print(f"Log file '{filename}' created.")
+        self.filename = filename
 
     def log(self, message):
         if self.filename == "":
