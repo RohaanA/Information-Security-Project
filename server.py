@@ -66,11 +66,12 @@ class Server:
         server_log("[CLIENT HANDLER] Client connected: {}:{}".format(*client_address), "success", logger_instance)
             # Receive data from the client
         received_data = ssl_socket.recv(1024)
-        print('Received data from client:', received_data)
+        # print('Received data from client:', received_data)
         packet,host,port = self._generate_packet_from_request(received_data)
         
         destination_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         destination_socket.connect((host, int(port)))
+        print(packet)
         destination_socket.send(packet.encode())
 
         # Receive the response from the destination

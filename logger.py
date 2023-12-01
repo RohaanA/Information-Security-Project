@@ -36,3 +36,6 @@ class Logger:
             file.write(f"{timestamp}: {message}\n")
 
         print(f"Logged message to '{self.filename}': {message}")
+        
+        #Close the log file
+        file.close()
