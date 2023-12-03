@@ -79,8 +79,13 @@ class Server:
         print(packet)
         destination_socket.send(packet.encode())
 
-        # Receive the response from the destination
-        response = destination_socket.recv(8388608)
+        # Receive the response from the destination in a loop until no more data is received
+        response = b''
+        while True:
+            data = destination_socket.recv(1024)
+            if not data:
+                break
+            response += data
 
         # Print the response
         decoded_response = response.decode()
