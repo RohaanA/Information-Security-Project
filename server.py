@@ -80,7 +80,7 @@ class Server:
         destination_socket.send(packet.encode())
 
         # Receive the response from the destination
-        response = destination_socket.recv(8192)
+        response = destination_socket.recv(131072)
 
         # Print the response
         decoded_response = response.decode()
