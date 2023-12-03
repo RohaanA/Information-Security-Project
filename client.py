@@ -29,7 +29,7 @@ print(http_packet)
 ssl_socket.send(http_packet.encode())
 
 # Receive a response from the server
-response = ssl_socket.recv(131072)
+response = ssl_socket.recv(8388608)
 print('Received response from server:', response.decode())
 
 # Save the received data to an HTML file
