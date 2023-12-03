@@ -141,16 +141,20 @@ class Server:
                         # Accept new client connection
                         client_socket, client_address = server_socket.accept()
                         print('Accepted connection from {}:{}'.format(client_address[0], client_address[1]))
-                        # Wrap the client socket with an SSL/TLS context
-                        ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-                        print(self._certfile)
-                        print(self._keyfile)
-                        ssl_context.load_cert_chain(certfile=self._certfile, keyfile=self._keyfile)
-                        ssl_socket = ssl_context.wrap_socket(client_socket, server_side=True)
-                        # Add the new client socket to the list of sockets
-                        sockets.append(ssl_socket)
-                        # Start a new thread to handle the client
-                        threading.Thread(target=self._handle_client, args=(client_socket, ssl_socket, client_address)).start()
+                        try:
+                            # Wrap the client socket with an SSL/TLS context
+                            ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                            print(self._certfile)
+                            print(self._keyfile)
+                            ssl_context.load_cert_chain(certfile=self._certfile, keyfile=self._keyfile)
+                            ssl_socket = ssl_context.wrap_socket(client_socket, server_side=True)
+                            # Add the new client socket to the list of sockets
+                            sockets.append(ssl_socket)
+                            # Start a new thread to handle the client
+                            threading.Thread(target=self._handle_client, args=(client_socket, ssl_socket, client_address)).start()
+                        except ssl.SSLError:
+                            print('SSL/TLS handshake failed. Closing connection.')
+                            client_socket.close()
 
                     else:
                         # Handle client communication
