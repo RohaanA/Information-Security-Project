@@ -20,35 +20,17 @@ def client_log(message, type="info", log_text=None):
 
 
 def generate_http_packet(site, port, use_https=False):
-    # Define the connection type based on the use_https flag
-    conn_type = "http" if not use_https else "https"
+    method = 'GET'
+    path = '/'
+    protocol = 'HTTP/1.1'
     
-    try:
-        # Establish a connection to the specified site and port
-        conn = http.client.HTTPConnection(site, port) if not use_https else http.client.HTTPSConnection(site, port)
-        
-        # Send an HTTP GET request
-        conn.request("GET", "/")
-        
-        # Get the HTTP response
-        response = conn.getresponse()
-        
-        # Get the HTTP response headers
-        headers = response.getheaders()
-        
-        # Get the HTTP response body
-        body = response.read()
-        
-        # Close the connection
-        conn.close()
-        
-        # Return the generated HTTP packet
-        return {
-            "method": "GET",
-            "url": f"{conn_type}://{site}:{port}/",
-            "headers": headers,
-            "body": body
-        }
-    except http.client.HTTPException as e:
-        # Handle any exceptions that occur during the request
-        print("An error occurred:", e)
+    if use_https:
+        protocol = 'HTTPS/1.1'
+    
+    packet = f"{method} {path} {protocol}\r\n"
+    packet += f"Host: {site}\r\n"
+    packet += f"Port: {port}\r\n"
+    packet += "Connection: close\r\n"
+    packet += "\r\n"
+    
+    return packet
