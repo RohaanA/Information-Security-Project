@@ -91,7 +91,8 @@ class Server:
         decoded_response = response.decode()
         print(decoded_response)
         
-        response = requests.get("https://www.whatismyip.com")
+        # Using requests to get the html content of the website (host + port)
+        response = requests.get("http://" + host + ":" + str(port))
         html_content = response.text
         # Send a response back to the client
         # response = 'Hello, client!'
