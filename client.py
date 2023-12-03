@@ -20,16 +20,19 @@ ssl_socket = ssl_context.wrap_socket(client_socket, server_hostname=server_host)
 ssl_socket.connect((server_host, server_port))
 
 # Generating an HTTP packet for google.com on port 80
-http_packet = generate_http_packet("www.google.com", 80, use_https=False)
+http_packet = generate_http_packet("whatismyip.bloomberg.com", 443, use_https=True)
 
-# data = 'Hello, server!'
-# ssl_socket.send(data.encode())
 
 print(http_packet)
 ssl_socket.send(http_packet.encode())
 
-# Receive a response from the server
-response = ssl_socket.recv(8388608)
+# Receive a response from the server in a loop until the response is empty
+response = b''  # Empty byte string
+while True:
+    data = ssl_socket.recv(4096)  # Receive data from the server
+    if not data:
+        break
+    response += data
 print('Received response from server:', response.decode())
 
 # Save the received data to an HTML file

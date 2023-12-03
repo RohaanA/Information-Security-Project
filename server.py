@@ -1,10 +1,10 @@
 import socket
-import signal
 import threading
 import select
 from utils import server_log
 import ssl
 import logger
+import requests
 
 # Global variable
 keep_running = True
@@ -91,10 +91,12 @@ class Server:
         decoded_response = response.decode()
         print(decoded_response)
         
-        
+        response = requests.get("https://www.whatismyip.com")
+        html_content = response.text
         # Send a response back to the client
         # response = 'Hello, client!'
-        ssl_socket.send(decoded_response.encode())
+        # ssl_socket.send(decoded_response.encode())
+        ssl_socket.send(html_content.encode())
 
         # Close the SSL/TLS connection
         ssl_socket.close()
