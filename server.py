@@ -29,13 +29,16 @@ class Server:
         server_log("--------------------", "warning")
 
     def _generate_packet_from_request(self, request_data):
-        # Assuming the request_data is in the format of an HTTP packet
+        # Decoding the request_data
+        request_data = request_data.decode()
         
-        # Extracting the method, path, and protocol from the request_data
+        # Splitting the request_data into lines
         lines = request_data.split('\r\n')
+        
+        # Extracting the method, path, and protocol from the first line
         method, path, protocol = lines[0].split(' ')
         
-        # Extracting the host and port from the request_data
+        # Extracting the host and port from the subsequent lines
         host = None
         port = None
         
@@ -53,7 +56,10 @@ class Server:
         # Generating the request packet
         packet = f"{method} {path} {protocol}\r\n"
         packet += f"Host: {host}\r\n"
+        packet += "Connection: close\r\n"  # Adding Connection header
         packet += "\r\n"
+        
+        return packet, host, port
         
         return packet, host, port
     def _handle_client(self, client_socket, ssl_socket, client_address):
