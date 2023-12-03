@@ -29,33 +29,32 @@ class Server:
         server_log("--------------------", "warning")
 
     def _generate_packet_from_request(self, request_data):
-        # Convert the request data to string and split it into lines
-        request_lines = request_data.decode().split("\r\n")
-
-        # Extract the request method, URL, and protocol version
-        request_line = request_lines[0]
-        method, url, version = request_line.split(" ")
-
-        # Extract the headers from the request
-        headers = {}
-        for line in request_lines[1:]:
-            if not line:
+        # Assuming the request_data is in the format of an HTTP packet
+        
+        # Extracting the method, path, and protocol from the request_data
+        lines = request_data.split('\r\n')
+        method, path, protocol = lines[0].split(' ')
+        
+        # Extracting the host and port from the request_data
+        host = None
+        port = None
+        
+        for line in lines[1:]:
+            if line.startswith('Host:'):
+                host_with_port = line.split(': ')[1]
+                if ':' in host_with_port:
+                    host, port = host_with_port.split(':')
+                    port = int(port)
+                else:
+                    host = host_with_port
+                    port = 80  # Default port if not specified
                 break
-            header_name, header_value = line.split(": ", 1)
-            headers[header_name] = header_value
-
-        # Extract the host and port from the URL
-        host_port = url.split("//")[1].split("/")[0]
-        host, port = host_port.split(":")
-
-        # Create the packet by combining the method, URL, headers, and body (if any)
-        packet = f"{method} {url} {version}\r\n"
-        for header_name, header_value in headers.items():
-            packet += f"{header_name}: {header_value}\r\n"
+        
+        # Generating the request packet
+        packet = f"{method} {path} {protocol}\r\n"
+        packet += f"Host: {host}\r\n"
         packet += "\r\n"
-
-        # Print the generated packet
-        print(packet)
+        
         return packet, host, port
     def _handle_client(self, client_socket, ssl_socket, client_address):
         #Setup the logger
