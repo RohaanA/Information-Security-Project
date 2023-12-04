@@ -140,10 +140,10 @@ class Server:
                         # Accept new client connection
                         client_socket, client_address = server_socket.accept()
                         # Check if the client is whitelisted
-                        if not check_whitelist(client_address[0]):
-                            server_log("Client " + str(client_address[0]) + " is not whitelisted. Closing connection.", "warning")
-                            client_socket.close()
-                            continue
+                        # if not check_whitelist(client_address[0]):
+                        #     server_log("Client " + str(client_address[0]) + " is not whitelisted. Closing connection.", "warning")
+                        #     client_socket.close()
+                        #     continue
                         print('Accepted connection from {}:{}'.format(client_address[0], client_address[1]))
                         try:
                             # Wrap the client socket with an SSL/TLS context
