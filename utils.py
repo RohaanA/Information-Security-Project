@@ -39,3 +39,9 @@ def extract_new_location(response):
         if line.startswith('Location: '):
             return line.split('Location: ')[1]  # Extract the new location
     return None
+def check_whitelist(IP):
+    with open("credentials/whitelist.txt", "r") as file:
+        for line in file:
+            if line.strip() == IP:
+                return True
+    return False

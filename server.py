@@ -1,11 +1,10 @@
 import socket
 import threading
 import select
-from utils import server_log
+from utils import server_log, check_whitelist
 import ssl
 import logger
 import requests
-
 # Global variable
 keep_running = True
 
@@ -140,6 +139,11 @@ class Server:
                     if sock is server_socket:
                         # Accept new client connection
                         client_socket, client_address = server_socket.accept()
+                        # Check if the client is whitelisted
+                        if not check_whitelist(client_address[0]):
+                            server_log("Client " + str(client_address[0]) + " is not whitelisted. Closing connection.", "warning")
+                            client_socket.close()
+                            continue
                         print('Accepted connection from {}:{}'.format(client_address[0], client_address[1]))
                         try:
                             # Wrap the client socket with an SSL/TLS context

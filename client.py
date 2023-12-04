@@ -19,7 +19,8 @@ ssl_socket = ssl_context.wrap_socket(client_socket, server_hostname=server_host)
 ssl_socket.connect((server_host, server_port))
 
 # Generating an HTTP packet for google.com on port 80
-http_packet = generate_http_packet("nu.edu.pk", 443, use_https=True)
+http_packet = generate_http_packet("flexstudent.nu.edu.pk", 443, use_https=True)
+# http_packet = generate_http_packet("whatismyip.bloomberg.com", 443, use_https=True)
 
 
 print(http_packet)
